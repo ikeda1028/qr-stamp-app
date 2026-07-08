@@ -35,10 +35,10 @@ Web側を変更したあと、iOS同梱ファイルを更新する場合:
 node tools/build-native.mjs
 ```
 
-署名なしのシミュレータ向けビルド確認:
+署名なしのiPhone向けビルド確認:
 
 ```bash
-xcodebuild -project native/ios/MANABITankyuPoint.xcodeproj -scheme MANABITankyuPoint -configuration Debug -sdk iphonesimulator -derivedDataPath .build/DerivedData CODE_SIGNING_ALLOWED=NO build
+xcodebuild -project native/ios/MANABITankyuPoint.xcodeproj -target MANABITankyuPoint -configuration Debug -sdk iphoneos CODE_SIGNING_ALLOWED=NO build
 ```
 
 CapacitorでiOS/Androidアプリとして生成する構成も追加しています。
