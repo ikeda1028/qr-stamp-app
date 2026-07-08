@@ -25,6 +25,7 @@ const rewards = [
 
 const storageKey = "qr-stamp-demo-state";
 const maxStamps = 8;
+const pointCooldownMs = 60 * 60 * 1000;
 let stream = null;
 let scanTimer = null;
 let scanCanvas = null;
@@ -61,12 +62,12 @@ render();
 
 function loadState() {
   const raw = localStorage.getItem(storageKey);
-  if (!raw) return { stamps: [], points: 0, cards: [] };
+  if (!raw) return { stamps: [], points: 0, cards: [], lastPointAt: null };
 
   try {
-    return JSON.parse(raw);
+    return { stamps: [], points: 0, cards: [], lastPointAt: null, ...JSON.parse(raw) };
   } catch {
-    return { stamps: [], points: 0, cards: [] };
+    return { stamps: [], points: 0, cards: [], lastPointAt: null };
   }
 }
 
@@ -93,6 +94,12 @@ function checkIn(rawCode) {
     return;
   }
 
+  const cooldown = getPointCooldown();
+  if (cooldown.remainingMs > 0) {
+    setStatus(`ポイントは60分に一度だけ獲得できます。あと${formatDuration(cooldown.remainingMs)}待ってください。`);
+    return;
+  }
+
   state.stamps.push({
     code: base.code,
     name: base.name,
@@ -100,10 +107,11 @@ function checkIn(rawCode) {
     checkedInAt: new Date().toISOString(),
   });
   state.points += base.points;
+  state.lastPointAt = new Date().toISOString();
   unlockRewards();
   saveState();
   render();
-  setStatus(`${base.name} でチェックイン。${base.points}ポイント獲得しました。`);
+  setStatus(`${base.name} でチェックイン。${base.points}ポイント獲得しました。次のポイント獲得は60分後です。`);
   els.manualCode.value = "";
 }
 
@@ -122,6 +130,26 @@ function unlockRewards() {
       state.cards.push(reward.title);
     }
   });
+}
+
+function getPointCooldown() {
+  if (!state.lastPointAt) return { remainingMs: 0 };
+
+  const lastPointTime = new Date(state.lastPointAt).getTime();
+  if (!Number.isFinite(lastPointTime)) return { remainingMs: 0 };
+
+  const elapsedMs = Date.now() - lastPointTime;
+  return { remainingMs: Math.max(0, pointCooldownMs - elapsedMs) };
+}
+
+function formatDuration(milliseconds) {
+  const totalMinutes = Math.ceil(milliseconds / 60000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours > 0 && minutes > 0) return `${hours}時間${minutes}分`;
+  if (hours > 0) return `${hours}時間`;
+  return `${minutes}分`;
 }
 
 async function startScanner() {
@@ -219,6 +247,7 @@ function resetDemo() {
   state.stamps = [];
   state.points = 0;
   state.cards = [];
+  state.lastPointAt = null;
   saveState();
   stopScanner();
   render();
