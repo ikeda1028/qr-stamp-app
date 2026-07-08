@@ -271,9 +271,10 @@ function renderStamps() {
     const stamp = template.content.firstElementChild.cloneNode(true);
     const label = stamp.querySelector("span");
     const stampData = state.stamps[index];
-    label.textContent = stampData ? "✓" : index + 1;
+    label.textContent = "";
+    label.setAttribute("aria-label", stampData ? `${stampData.name} 解錠済み` : "未取得 ロック中");
     stamp.classList.toggle("filled", Boolean(stampData));
-    stamp.title = stampData ? stampData.name : "未取得";
+    stamp.title = stampData ? `${stampData.name} 解錠済み` : "未取得 ロック中";
     els.stampGrid.append(stamp);
   }
 
