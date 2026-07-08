@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-label="拠点の受付イメージ">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#dcefe8"/>
+      <stop offset="1" stop-color="#f6e6d5"/>
+    </linearGradient>
+    <linearGradient id="wall" x1="0" x2="1">
+      <stop offset="0" stop-color="#33695a"/>
+      <stop offset="1" stop-color="#4b8ca8"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="620" fill="url(#sky)"/>
+  <path d="M0 430 C180 355 320 430 475 365 C640 295 742 332 900 250 L900 620 L0 620Z" fill="#d9e7dd"/>
+  <rect x="150" y="155" width="600" height="340" rx="18" fill="url(#wall)"/>
+  <rect x="200" y="215" width="180" height="190" rx="8" fill="#f7f5ef" opacity=".9"/>
+  <rect x="420" y="215" width="280" height="190" rx="8" fill="#f7f5ef" opacity=".92"/>
+  <rect x="232" y="250" width="116" height="116" rx="12" fill="#1d2528"/>
+  <path d="M250 268h28v28h-28zM304 268h26v26h-26zM252 322h26v26h-26zM294 312h14v14h-14zM318 332h14v14h-14z" fill="#fff"/>
+  <rect x="462" y="254" width="190" height="28" rx="14" fill="#25745a"/>
+  <rect x="462" y="306" width="140" height="20" rx="10" fill="#f4b942"/>
+  <rect x="0" y="492" width="900" height="128" fill="#50605a"/>
+</svg>

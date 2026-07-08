@@ -19,6 +19,57 @@
 3. Settings → Pages → Build and deployment → Source を `GitHub Actions` に設定
 4. Actions の `Deploy to GitHub Pages` が完了すると公開URLが発行されます
 
+## ネイティブアプリ化
+
+すぐにiPhoneアプリとして確認できるXcodeプロジェクトを `native/ios/MANABITankyuPoint.xcodeproj` に追加しています。Web版をWKWebViewに同梱し、カメラ権限文言も設定済みです。
+
+```bash
+open native/ios/MANABITankyuPoint.xcodeproj
+```
+
+XcodeでSigning Teamを選ぶと、iPhone実機へインストールして確認できます。QRカメラ読み取りは実機で確認してください。
+
+Web側を変更したあと、iOS同梱ファイルを更新する場合:
+
+```bash
+node tools/build-native.mjs
+```
+
+署名なしのシミュレータ向けビルド確認:
+
+```bash
+xcodebuild -project native/ios/MANABITankyuPoint.xcodeproj -scheme MANABITankyuPoint -configuration Debug -sdk iphonesimulator -derivedDataPath .build/DerivedData CODE_SIGNING_ALLOWED=NO build
+```
+
+CapacitorでiOS/Androidアプリとして生成する構成も追加しています。
+
+```bash
+npm install
+npm run build
+npx cap add ios
+npx cap add android
+npm run native:sync
+```
+
+iPhoneアプリとして確認する場合:
+
+```bash
+npm run native:ios
+```
+
+Androidアプリとして確認する場合:
+
+```bash
+npm run native:android
+```
+
+Capacitorで生成したネイティブプロジェクトには、カメラ権限が必要です。`npx cap add ios` / `npx cap add android` 実行後に、下記を設定してください。
+
+- iOS: `ios/App/App/Info.plist` に `NSCameraUsageDescription` を追加
+- Android: `android/app/src/main/AndroidManifest.xml` に `android.permission.CAMERA` を追加
+
+権限文言例: `拠点QRを読み取るためにカメラを使用します。`
+
 ## 本番化の差し替えポイント
 
 - `localStorage`: Firebase Firestore、Supabase、PostgreSQL などに変更

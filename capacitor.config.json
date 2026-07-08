@@ -1,0 +1,11 @@
+{
+  "appId": "jp.manabi.tankyu.point",
+  "appName": "MANABI探究ポイント",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "automatic"
+  }
+}
