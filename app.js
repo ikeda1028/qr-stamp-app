@@ -27,6 +27,8 @@ const storageKey = "qr-stamp-demo-state";
 const maxStamps = 8;
 let stream = null;
 let scanTimer = null;
+let scanCanvas = null;
+let scanContext = null;
 
 const state = loadState();
 const els = {
@@ -123,8 +125,8 @@ function unlockRewards() {
 }
 
 async function startScanner() {
-  if (!("BarcodeDetector" in window)) {
-    setStatus("このブラウザはQRカメラ読み取り非対応です。コード入力で試せます。");
+  if (!navigator.mediaDevices?.getUserMedia) {
+    setStatus("このブラウザではカメラを開始できません。コード入力で試せます。");
     return;
   }
 
@@ -136,8 +138,21 @@ async function startScanner() {
     els.camera.srcObject = stream;
     await els.camera.play();
     els.scannerFrame.classList.add("camera-on");
-    setStatus("QRを枠内に入れてください。");
-    scanLoop(new BarcodeDetector({ formats: ["qr_code"] }));
+
+    if ("BarcodeDetector" in window) {
+      setStatus("QRを枠内に入れてください。");
+      scanLoop(new BarcodeDetector({ formats: ["qr_code"] }));
+      return;
+    }
+
+    if (typeof window.jsQR === "function") {
+      setStatus("QRを枠内に入れてください。");
+      scanLoop(null);
+      return;
+    }
+
+    stopScanner();
+    setStatus("QR解析ライブラリを読み込めませんでした。コード入力で試せます。");
   } catch {
     setStatus("カメラを開始できませんでした。権限設定を確認するかコード入力で試してください。");
   }
@@ -149,9 +164,9 @@ function scanLoop(detector) {
     if (!stream) return;
 
     try {
-      const codes = await detector.detect(els.camera);
-      if (codes.length > 0) {
-        checkIn(codes[0].rawValue);
+      const value = detector ? await detectWithBarcodeDetector(detector) : detectWithJsQr();
+      if (value) {
+        checkIn(value);
         stopScanner();
         return;
       }
@@ -161,6 +176,33 @@ function scanLoop(detector) {
 
     scanLoop(detector);
   }, 450);
+}
+
+async function detectWithBarcodeDetector(detector) {
+  const codes = await detector.detect(els.camera);
+  return codes[0]?.rawValue || "";
+}
+
+function detectWithJsQr() {
+  if (!els.camera.videoWidth || !els.camera.videoHeight || typeof window.jsQR !== "function") {
+    return "";
+  }
+
+  if (!scanCanvas) {
+    scanCanvas = document.createElement("canvas");
+    scanContext = scanCanvas.getContext("2d", { willReadFrequently: true });
+  }
+
+  scanCanvas.width = els.camera.videoWidth;
+  scanCanvas.height = els.camera.videoHeight;
+  scanContext.drawImage(els.camera, 0, 0, scanCanvas.width, scanCanvas.height);
+
+  const imageData = scanContext.getImageData(0, 0, scanCanvas.width, scanCanvas.height);
+  const code = window.jsQR(imageData.data, imageData.width, imageData.height, {
+    inversionAttempts: "dontInvert",
+  });
+
+  return code?.data || "";
 }
 
 function stopScanner() {
