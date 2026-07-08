@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>拠点スタンプ</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="topbar" aria-label="概要">
+        <div>
+          <p class="eyebrow">QR CHECK-IN</p>
+          <h1>拠点スタンプ</h1>
+        </div>
+        <button class="ghost-button" id="resetButton" type="button" title="デモデータをリセット">
+          ↺
+        </button>
+      </section>
+
+      <section class="profile-band">
+        <div class="avatar" aria-hidden="true">森</div>
+        <div>
+          <p class="muted">現在のポイント</p>
+          <strong id="pointTotal">0 pt</strong>
+        </div>
+        <div>
+          <p class="muted">スタンプ</p>
+          <strong><span id="stampTotal">0</span>/8</strong>
+        </div>
+      </section>
+
+      <section class="scanner-section" aria-label="QR読み取り">
+        <div class="scanner-frame">
+          <video id="camera" playsinline muted></video>
+          <div class="scan-overlay" aria-hidden="true"></div>
+          <div class="scanner-fallback" id="scannerFallback">
+            <span>QR</span>
+          </div>
+        </div>
+        <div class="scan-actions">
+          <button class="primary-button" id="startScanButton" type="button">カメラで読む</button>
+          <button class="secondary-button" id="stopScanButton" type="button">停止</button>
+        </div>
+        <div class="manual-entry">
+          <input id="manualCode" type="text" inputmode="latin" placeholder="例: BASE-A" />
+          <button class="icon-button" id="manualCheckInButton" type="button" title="コードでチェックイン">
+            ✓
+          </button>
+        </div>
+        <p class="status" id="statusText">拠点QRまたはデモコードでチェックインできます。</p>
+      </section>
+
+      <section class="progress-section" aria-label="スタンプカード">
+        <div class="section-heading">
+          <h2>スタンプカード</h2>
+          <p id="nextRewardText">あと3個で最初のカード</p>
+        </div>
+        <div class="stamp-grid" id="stampGrid"></div>
+      </section>
+
+      <section class="rewards-section" aria-label="解放カード">
+        <div class="section-heading">
+          <h2>解放カード</h2>
+          <p>条件達成で自動解放</p>
+        </div>
+        <div class="reward-list" id="rewardList"></div>
+      </section>
+
+      <section class="bases-section" aria-label="デモ拠点">
+        <div class="section-heading">
+          <h2>デモ拠点</h2>
+          <p>QRに入れる値</p>
+        </div>
+        <div class="base-list" id="baseList"></div>
+      </section>
+
+      <section class="ai-section" aria-label="AI連携">
+        <div class="section-heading">
+          <h2>AI連携メモ</h2>
+          <p>カード生成・案内文</p>
+        </div>
+        <div class="ai-card" id="aiMessage"></div>
+      </section>
+    </main>
+
+    <template id="stampTemplate">
+      <div class="stamp">
+        <span></span>
+      </div>
+    </template>
+
+    <template id="rewardTemplate">
+      <article class="reward-card">
+        <div class="reward-art"></div>
+        <div>
+          <p class="reward-state"></p>
+          <h3></h3>
+          <p class="reward-body"></p>
+        </div>
+      </article>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
