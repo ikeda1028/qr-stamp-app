@@ -7,25 +7,23 @@ const bases = [
 
 const rewards = [
   {
-    threshold: 3,
-    title: "ビギナーカード",
-    body: "最初の3拠点を巡った記念カード。次の拠点候補をAIが提案できます。",
+    thresholdPoints: 40,
+    title: "むきあうかぎ",
+    body: "じぶんを見つめ、しんけんに取り組むことで、よりよいじぶんになれるかぎ。",
+    image: "./assets/mukiau-kagi.png",
   },
   {
-    threshold: 5,
-    title: "エリアマスター",
-    body: "5スタンプ到達で解放。限定クーポンや会員証デザインにも展開できます。",
-  },
-  {
-    threshold: 8,
-    title: "シークレットカード",
-    body: "全スタンプ達成で解放。画像生成AIで特別カードを発行する想定です。",
+    thresholdPoints: 80,
+    title: "かんがえるかぎ",
+    body: "じぶんの目で見て、つながりを見つけ、新しいものを生み出すことができるかぎ。",
+    image: "./assets/kangaeru-kagi.png",
   },
 ];
 
 const storageKey = "qr-stamp-demo-state";
 const maxStamps = 8;
 const pointCooldownMs = 60 * 60 * 1000;
+const pointKeyLevels = [1000, 100, 10, 1];
 let stream = null;
 let scanTimer = null;
 let scanCanvas = null;
@@ -58,6 +56,8 @@ els.manualCode.addEventListener("keydown", (event) => {
 });
 els.resetButton.addEventListener("click", resetDemo);
 
+unlockRewards();
+saveState();
 render();
 
 function loadState() {
@@ -124,7 +124,7 @@ function normalizeCode(rawCode) {
 
 function unlockRewards() {
   rewards.forEach((reward) => {
-    const reached = state.stamps.length >= reward.threshold;
+    const reached = state.points >= reward.thresholdPoints;
     const alreadyUnlocked = state.cards.includes(reward.title);
     if (reached && !alreadyUnlocked) {
       state.cards.push(reward.title);
@@ -271,17 +271,24 @@ function renderStamps() {
     const stamp = template.content.firstElementChild.cloneNode(true);
     const label = stamp.querySelector("span");
     const stampData = state.stamps[index];
+    const pointKeyLevel = getPointKeyLevel(stampData?.points);
     label.textContent = "";
-    label.setAttribute("aria-label", stampData ? `${stampData.name} 解錠済み` : "未取得 ロック中");
+    label.setAttribute("aria-label", stampData ? `${stampData.points}ポイント鍵` : "未取得 ロック中");
     stamp.classList.toggle("filled", Boolean(stampData));
-    stamp.title = stampData ? `${stampData.name} 解錠済み` : "未取得 ロック中";
+    if (pointKeyLevel) stamp.dataset.pointKey = String(pointKeyLevel);
+    stamp.title = stampData ? `${stampData.name} ${stampData.points}ポイント鍵` : "未取得 ロック中";
     els.stampGrid.append(stamp);
   }
 
-  const nextReward = rewards.find((reward) => state.stamps.length < reward.threshold);
+  const nextReward = rewards.find((reward) => state.points < reward.thresholdPoints);
   els.nextRewardText.textContent = nextReward
-    ? `あと${nextReward.threshold - state.stamps.length}個で${nextReward.title}`
-    : "すべて解放済み";
+    ? `あと${nextReward.thresholdPoints - state.points}ptで${nextReward.title}`
+    : "80ptクリア";
+}
+
+function getPointKeyLevel(points) {
+  const pointValue = Number(points) || 0;
+  return pointKeyLevels.find((level) => pointValue >= level) || null;
 }
 
 function renderRewards() {
@@ -290,11 +297,16 @@ function renderRewards() {
 
   rewards.forEach((reward) => {
     const card = template.content.firstElementChild.cloneNode(true);
+    const art = card.querySelector(".reward-art");
     const unlocked = state.cards.includes(reward.title);
     card.classList.toggle("locked", !unlocked);
+    if (reward.image) {
+      art.classList.add("reward-art-image");
+      art.style.backgroundImage = `url("${reward.image}")`;
+    }
     card.querySelector(".reward-state").textContent = unlocked
-      ? "UNLOCKED"
-      : `${reward.threshold}スタンプで解放`;
+      ? "CLEAR"
+      : `${reward.thresholdPoints}ptでクリア`;
     card.querySelector("h3").textContent = reward.title;
     card.querySelector(".reward-body").textContent = unlocked
       ? reward.body

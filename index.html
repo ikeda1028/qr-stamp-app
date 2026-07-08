@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>拠点スタンプ</title>
-    <link rel="stylesheet" href="./styles.css?v=20260708-lock-stamps-2" />
+    <title>MANABI探究ポイント</title>
+    <link rel="stylesheet" href="./styles.css?v=20260708-point-keys" />
   </head>
   <body>
     <main class="app-shell">
       <section class="topbar" aria-label="概要">
         <div>
           <p class="eyebrow">QR CHECK-IN</p>
-          <h1>拠点スタンプ</h1>
+          <h1>MANABI探究ポイント</h1>
         </div>
         <button class="ghost-button" id="resetButton" type="button" title="デモデータをリセット">
           ↺
@@ -54,7 +54,7 @@
       <section class="progress-section" aria-label="スタンプカード">
         <div class="section-heading">
           <h2>スタンプカード</h2>
-          <p id="nextRewardText">あと3個で最初のカード</p>
+          <p id="nextRewardText">あと40ptでむきあうかぎ</p>
         </div>
         <div class="stamp-grid" id="stampGrid"></div>
       </section>
@@ -62,7 +62,7 @@
       <section class="rewards-section" aria-label="解放カード">
         <div class="section-heading">
           <h2>解放カード</h2>
-          <p>条件達成で自動解放</p>
+          <p>40pt / 80ptでクリア</p>
         </div>
         <div class="reward-list" id="rewardList"></div>
       </section>
@@ -101,7 +101,7 @@
       </article>
     </template>
 
-    <script src="./vendor/jsQR.js?v=20260708-lock-stamps-2"></script>
-    <script src="./app.js?v=20260708-lock-stamps-2"></script>
+    <script src="./vendor/jsQR.js?v=20260708-point-keys"></script>
+    <script src="./app.js?v=20260708-point-keys"></script>
   </body>
 </html>
